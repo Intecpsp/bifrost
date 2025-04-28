@@ -172,7 +172,7 @@ pub fn router(appstate: AppState) -> Router<()> {
         .nest("/clip/v2/resource", clip::router())
         .nest("/eventstream", eventstream::router())
         .nest("/bifrost", bifrost::router())
-        .nest("/frontend", frontend::router())
+        .nest("/frontend", frontend::router(&appstate.config()))
         .with_state(appstate)
         .layer(DefaultBodyLimit::max(100 * 1024 * 1024))
 }

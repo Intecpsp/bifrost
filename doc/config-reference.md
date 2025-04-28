@@ -22,6 +22,12 @@ bifrost:
   # (this might require pairing the Hue App again)
   cert_file: "cert.pem"
 
+  # directory to serve static web frontend assets from
+  #
+  # Can be used to point to other frontend build directories,
+  # but should never need to be specified by end users.
+  frontend_dir: "frontend"
+
 # Bridge section
 #
 # Settings for hue bridge emulation

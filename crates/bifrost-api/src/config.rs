@@ -30,6 +30,7 @@ pub struct BridgeConfig {
 pub struct BifrostConfig {
     pub state_file: Utf8PathBuf,
     pub cert_file: Utf8PathBuf,
+    pub frontend_dir: Utf8PathBuf,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, Eq, PartialEq)]
