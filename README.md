@@ -140,6 +140,10 @@ Please choose one of the following installation methods:
 
 See [configuration reference](doc/config-reference.md).
 
+# Development
+
+See [development guide](doc/DEVELOPMENT.md).
+
 # Problems? Questions? Feedback?
 
 Please note: Bifrost is a very young project. Some things are incomplete, and/or
