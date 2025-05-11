@@ -13,6 +13,8 @@ use serde::Serialize;
 use serde_json::json;
 
 use bifrost_api::config::AppConfig;
+use tokio::fs::File;
+use tokio::io::AsyncWriteExt;
 
 use crate::routes::bifrost::websocket::websocket;
 use crate::routes::extractor::Json;
@@ -49,10 +51,27 @@ async fn get_config(State(state): State<AppState>) -> BifrostApiResult<Json<AppC
     Ok(Json((*state.config()).clone()))
 }
 
+async fn put_config(
+    State(state): State<AppState>,
+    Json(config): Json<AppConfig>,
+) -> BifrostApiResult<Json<()>> {
+    let mut fd = File::create("config2.yaml").await?;
+
+    let yml = serde_yml::to_string(&config)?;
+
+    fd.write_all(yml.as_bytes()).await?;
+
+    drop(fd);
+
+    state.replace_config(config.clone());
+
+    Ok(Json(()))
+}
+
 pub fn router() -> Router<AppState> {
     Router::new()
         .nest("/service", service::router())
         .nest("/backend", backend::router())
-        .route("/config", get(get_config))
+        .route("/config", get(get_config).put(put_config))
         .route("/ws", any(websocket))
 }
