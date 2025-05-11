@@ -5,7 +5,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::api::{
-    ColorTemperatureUpdate, ColorUpdate, DimmingUpdate, LightGradientUpdate, On, ResourceLink,
+    ColorTemperatureUpdate, ColorUpdate, DimmingUpdate, LightEffect, LightGradientUpdate, On,
+    ResourceLink,
 };
 use crate::date_format;
 
@@ -34,6 +35,39 @@ pub enum SceneStatusEnum {
     Active,
     Static,
     DynamicPalette,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub struct PaletteColorTemperature {
+    pub mirek: u16,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub struct PaletteEffect {
+    pub effect: LightEffect,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ScenePaletteColor {
+    pub color: ColorUpdate,
+    pub dimming: DimmingUpdate,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ScenePaletteColorTemperature {
+    pub color_temperature: PaletteColorTemperature,
+    pub dimming: DimmingUpdate,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+pub struct ScenePalette {
+    pub color: Vec<ScenePaletteColor>,
+    pub color_temperature: Vec<ScenePaletteColorTemperature>,
+    pub dimming: Vec<DimmingUpdate>,
+    #[serde(default)]
+    pub effects: Vec<PaletteEffect>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub effects_v2: Option<Vec<PaletteEffect>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
