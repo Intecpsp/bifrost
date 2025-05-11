@@ -4,6 +4,7 @@ use std::time::Duration;
 use axum::extract::ws::{Message, WebSocket};
 use axum::extract::{State, WebSocketUpgrade};
 use axum::response::Response;
+use bifrost_api::config::AppConfig;
 use bytes::Bytes;
 use tokio::select;
 
@@ -66,6 +67,11 @@ impl WebSocketTask {
         Ok(Some(Update::HueEvent(hue_event.block)))
     }
 
+    fn handle_app_config(&self, app_config: AppConfig) -> BifrostApiResult<Option<Update>> {
+        log::info!("Config: {app_config:?}");
+        Ok(Some(Update::AppConfig(app_config)))
+    }
+
     async fn handle_service_event(
         &mut self,
         service_event: Option<ServiceEvent>,
@@ -95,10 +101,12 @@ impl WebSocketTask {
         let hue_state = lock.get_resources();
         drop(lock);
 
+        let mut config = self.state.config_subscribe();
+
         let mut svc_events = self.mgr.subscribe().await?.1;
 
-        let app_config = self.state.config();
-        self.send(Update::AppConfig((*app_config).clone())).await?;
+        self.send(Update::AppConfig((*self.state.config()).clone()))
+            .await?;
 
         self.send(Update::HueEvent(EventBlock::add(hue_state)))
             .await?;
@@ -106,6 +114,7 @@ impl WebSocketTask {
         loop {
             let reply = select! {
                 () = tokio::time::sleep(Self::KEEP_ALIVE) => self.send_ping().await,
+                _ = config.changed() => self.handle_app_config(config.borrow().clone()),
                 Some(msg) = self.ws.recv() => self.handle_websocket_message(&msg?),
                 backend_event = backend_events.recv() => self.handle_backend_event(&backend_event?),
                 service_event = svc_events.recv() => self.handle_service_event(service_event).await,
