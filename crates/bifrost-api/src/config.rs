@@ -118,4 +118,8 @@ impl Client {
     pub async fn config(&self) -> BifrostResult<AppConfig> {
         self.get("config").await
     }
+
+    pub async fn put_config(&self, config: AppConfig) -> BifrostResult<()> {
+        self.put("config", config).await
+    }
 }
