@@ -1,0 +1,49 @@
+use std::collections::BTreeMap;
+
+use dioxus::prelude::*;
+
+use hue::api::{Resource, ResourceRecord};
+use uuid::Uuid;
+
+use crate::Route;
+use crate::component::light::{
+    LightColorTemperature, LightColorView, LightDimming, LightGradientView, LightOnIcon,
+};
+
+#[component]
+pub fn LightDetailView(id: Uuid, res: Signal<BTreeMap<Uuid, ResourceRecord>>) -> Element {
+    let Some(Resource::Light(light)) = res.read().get(&id).cloned().map(|x| x.obj) else {
+        return rsx! {};
+    };
+
+    rsx! {
+        div {
+            class: "max-w-160",
+
+            Link { to: Route::Lights, class: "btn btn-primary", "Back" },
+
+            h2 { class: "divider divider-primary divider-start", "On" }
+            LightOnIcon { id, on: light.on }
+
+            if light.color.is_some() {
+                h2 { class: "divider divider-primary divider-start", "Color" }
+                LightColorView { id, dimming: light.dimming, color: light.color }
+            }
+
+            if light.dimming.is_some() {
+                h2 { class: "divider divider-primary divider-start", "Dimming" }
+                LightDimming { id, dimming: light.dimming }
+            }
+
+            if light.color_temperature.is_some() {
+                h2 { class: "divider divider-primary divider-start", "Color temperature" }
+                LightColorTemperature { id, color_temperature: light.color_temperature }
+            }
+
+            if light.gradient.is_some() {
+                h2 { class: "divider divider-primary divider-start", "Gradient" }
+                LightGradientView { id, gradient: light.gradient }
+            }
+        }
+    }
+}

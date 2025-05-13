@@ -12,14 +12,19 @@ pub mod state;
 pub mod toast;
 pub mod traits;
 
+use std::str;
 use std::sync::LazyLock;
 
 use dioxus::prelude::*;
 use reqwest::Url;
+use uuid::Uuid;
 
 use bifrost_api::Client;
 
+use crate::component::backends::Backends;
+use crate::component::config::Config;
 use crate::hue_client::HueClient;
+use crate::page::{About, Frame, Groups, Index, LightDetails, Lights, Resources, Services};
 
 static BIFROST_SERVER: LazyLock<String> =
     LazyLock::new(|| option_env!("BIFROST_SERVER").map_or_else(base_url, ToString::to_string));
@@ -46,4 +51,35 @@ pub fn use_context_signal_provider<T: 'static>(f: impl FnOnce() -> T) -> Signal<
 #[must_use]
 pub fn use_context_signal<T>() -> Signal<T> {
     use_context::<Signal<T>>()
+}
+
+#[derive(Routable, Clone, PartialEq, Eq)]
+pub enum Route {
+    #[layout(Frame)]
+    #[route("/")]
+    Index,
+
+    #[route("/lights")]
+    Lights,
+
+    #[route("/lights/:id")]
+    LightDetails { id: Uuid },
+
+    #[route("/groups")]
+    Groups,
+
+    #[route("/services")]
+    Services,
+
+    #[route("/resources")]
+    Resources,
+
+    #[route("/config")]
+    Config,
+
+    #[route("/backends")]
+    Backends,
+
+    #[route("/about")]
+    About,
 }

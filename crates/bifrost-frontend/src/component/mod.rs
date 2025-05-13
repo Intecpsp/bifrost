@@ -7,6 +7,8 @@ pub mod enable_input;
 pub mod group;
 pub mod groups;
 pub mod light;
+pub mod light_details;
+pub mod lights;
 pub mod markup;
 pub mod resources;
 pub mod service;
