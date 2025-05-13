@@ -4,3 +4,4 @@ pub mod colortemp;
 pub mod config;
 pub mod light;
 pub mod markup;
+pub mod service;
