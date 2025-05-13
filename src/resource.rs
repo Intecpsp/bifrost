@@ -44,7 +44,7 @@ impl Resources {
             state,
             version,
             state_updates: Arc::new(Notify::new()),
-            backend_updates: Sender::new(32),
+            backend_updates: Sender::new(1024),
             hue_event_stream: HueEventStream::new(Self::HUE_EVENTS_BUFFER_SIZE),
         }
     }
