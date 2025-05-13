@@ -1,10 +1,22 @@
 #!/usr/bin/env python3
 
-# utils/generate-hue-icons.py < hass-hue-icons/dist/hass-hue-icons.js | rustfmt > crates/bifrost-frontend/src/hue_icons.rs
+# curl https://raw.githubusercontent.com/arallsopp/hass-hue-icons/refs/heads/main/dist/hass-hue-icons.js | utils/generate-hue-icons.py | rustfmt > crates/bifrost-frontend/src/hue_icons.rs
 
 import os
 import sys
 import json
+
+HEADER = r"""
+//! GENERATED FILE - DO NOT EDIT
+//!
+//! This file is derived from hass-hue-icons
+//!
+//!   <https://github.com/arallsopp/hass-hue-icons>
+//!
+//! These icons are licensed under Creative Commons:
+//!
+//!   [CC BY-NC-SA 4.0](http://creativecommons.org/licenses/by-nc-sa/4.0/)
+"""
 
 def upcase(name):
     return name.upper().replace("-", "_")
@@ -17,6 +29,8 @@ def main():
     js = f"{{ {body} }}"
 
     data = json.loads(js)
+
+    print(HEADER)
 
     for key, value in data.items():
         name = upcase(key)
