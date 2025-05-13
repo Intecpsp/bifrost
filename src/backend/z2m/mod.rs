@@ -12,6 +12,7 @@ use chrono::Utc;
 use futures::StreamExt;
 use maplit::btreeset;
 use native_tls::TlsConnector;
+use rand::seq::IndexedRandom;
 use serde::Deserialize;
 use serde_json::{Value, json};
 use tokio::select;
@@ -932,7 +933,9 @@ impl Z2mBackend {
                 log::debug!("Entertainment addresses: {addrs:04x?}");
                 drop(lock);
 
-                if let Some(target) = targets.first() {
+                let tgt = targets.choose(&mut rand::rng());
+                if let Some(target) = tgt {
+                    log::warn!("TB chose {tgt:?}");
                     let mut es = EntStream::new(self.counter, target, addrs);
 
                     // Not even a real Philips Hue bridge uses this trick!

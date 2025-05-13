@@ -101,7 +101,7 @@ impl EntStream {
     }
 
     pub async fn start_stream(&mut self, z2mws: &mut Z2mWebSocket) -> ApiResult<()> {
-        log::warn!("STREAM START (test branch3)");
+        log::warn!("STREAM START (test branch4)");
         log::debug!("Entertainment addrs: {:#?}", &self.addrs);
         log::debug!("Entertainment modes: {:#?}", &self.modes);
         for (dev, segments) in &self.addrs {
@@ -119,7 +119,7 @@ impl EntStream {
             z2mws.send_zigbee_message(dev, &mapping).await?;
         }
 
-        /* self.stop_stream(z2mws).await?; */
+        self.stop_stream(z2mws).await?;
 
         Ok(())
     }
@@ -129,7 +129,10 @@ impl EntStream {
         for topic in self.addrs.keys() {
             log::debug!("Sending stop to {topic}");
             z2mws.send_zigbee_message(topic, &stop).await?;
+            tokio::time::sleep(Duration::from_millis(250)).await;
         }
+
+        tokio::time::sleep(Duration::from_millis(1000)).await;
 
         Ok(())
     }
