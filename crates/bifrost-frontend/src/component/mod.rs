@@ -2,6 +2,7 @@ pub mod brightness;
 pub mod button;
 pub mod colortemp;
 pub mod config;
+pub mod enable_input;
 pub mod light;
 pub mod markup;
 pub mod service;
