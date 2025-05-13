@@ -6,6 +6,7 @@ pub mod daisyui;
 pub mod grommet_icons;
 pub mod hue_client;
 pub mod icons;
+pub mod page;
 pub mod state;
 pub mod toast;
 pub mod traits;
