@@ -12,6 +12,7 @@ use crate::HUE_CLIENT;
 use crate::component::colortemp::mirek_to_kelvin;
 use crate::daisyui::Level;
 use crate::daisyui::badge::Badge;
+use crate::icons::RoomIcon;
 
 fn css_rgb_from_xy(xy: XY) -> String {
     let [x, y, z] = WIDE.xyy_to_xyz(xy.x, xy.y, 0.7);
@@ -68,6 +69,9 @@ pub fn GroupView(res: Signal<BTreeMap<Uuid, ResourceRecord>>, id: Uuid, room: Ro
         .collect();
 
     rsx! {
+        RoomIcon {
+            archetype: room.metadata.archetype,
+        }
         ul {
             for child in room.children {
                 li {
