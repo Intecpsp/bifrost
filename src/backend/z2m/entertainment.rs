@@ -1,4 +1,5 @@
 use std::collections::BTreeMap;
+use std::time::Duration;
 
 use serde_json::json;
 
@@ -112,9 +113,10 @@ impl EntStream {
 
             let mapping = self.stream.segment_mapping(segments)?;
             z2mws.send_zigbee_message(dev, &mapping).await?;
+            tokio::time::sleep(Duration::from_millis(250)).await;
         }
 
-        self.stop_stream(z2mws).await?;
+        /* self.stop_stream(z2mws).await?; */
 
         Ok(())
     }
