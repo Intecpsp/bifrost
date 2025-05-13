@@ -2,6 +2,7 @@
 #![allow(unused_qualifications)]
 
 pub mod daisyui;
+pub mod grommet_icons;
 pub mod hue_client;
 pub mod icons;
 pub mod state;
