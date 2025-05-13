@@ -8,5 +8,6 @@ pub mod group;
 pub mod groups;
 pub mod light;
 pub mod markup;
+pub mod resources;
 pub mod service;
 pub mod z2m;
