@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
 #![allow(unused_qualifications)]
 
+pub mod component;
 pub mod daisyui;
 pub mod grommet_icons;
 pub mod hue_client;
