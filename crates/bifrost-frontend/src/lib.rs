@@ -17,12 +17,17 @@ use reqwest::Url;
 
 use bifrost_api::Client;
 
+use crate::hue_client::HueClient;
+
 static BIFROST_SERVER: LazyLock<String> =
     LazyLock::new(|| option_env!("BIFROST_SERVER").map_or_else(base_url, ToString::to_string));
 
 static CLIENT: LazyLock<Client> = LazyLock::new(|| {
     Client::from_url(Url::try_from(format!("{}/bifrost/", *BIFROST_SERVER).as_str()).unwrap())
 });
+
+static HUE_CLIENT: LazyLock<HueClient> =
+    LazyLock::new(|| HueClient::from_url(Url::try_from(BIFROST_SERVER.as_str()).unwrap()));
 
 const LOGO_SVG: Asset = asset!("/assets/logo.svg");
 
