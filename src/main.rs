@@ -3,6 +3,8 @@ use std::io::Write;
 use bifrost::backend;
 use bifrost::config;
 use bifrost::error::ApiResult;
+use bifrost::logging::LogHistory;
+use bifrost::logging::LogTap;
 use bifrost::server::appstate::AppState;
 use bifrost::server::http::HttpServer;
 use bifrost::server::mdns::MdnsService;
@@ -37,7 +39,7 @@ fn syslog_format(
     )
 }
 
-fn init_logging() -> ApiResult<()> {
+fn init_logging() -> ApiResult<LogHistory> {
     /* Try to provide reasonable default filters, when RUST_LOG is not specified */
     const DEFAULT_LOG_FILTERS: &[&str] = &[
         "debug",
@@ -51,16 +53,23 @@ fn init_logging() -> ApiResult<()> {
     let log_filters = std::env::var("RUST_LOG").unwrap_or_else(|_| DEFAULT_LOG_FILTERS.join(","));
 
     /* Detect if we need syslog or human-readable formatting */
-    if std::env::var("SYSTEMD_EXEC_PID").is_ok_and(|pid| pid == std::process::id().to_string()) {
-        Ok(pretty_env_logger::env_logger::builder()
+    let logger = if std::env::var("SYSTEMD_EXEC_PID")
+        .is_ok_and(|pid| pid == std::process::id().to_string())
+    {
+        pretty_env_logger::env_logger::builder()
             .format(syslog_format)
             .parse_filters(&log_filters)
-            .try_init()?)
+            .build()
     } else {
-        Ok(pretty_env_logger::formatted_timed_builder()
+        pretty_env_logger::formatted_timed_builder()
             .parse_filters(&log_filters)
-            .try_init()?)
-    }
+            .build()
+    };
+
+    let tap = LogTap::init(logger)?;
+    let history = LogHistory::new(tap);
+
+    Ok(history)
 }
 
 #[allow(clippy::similar_names)]
@@ -158,7 +167,7 @@ fn install_signal_handlers(appstate: &AppState) -> ApiResult<()> {
 }
 
 async fn run() -> ApiResult<()> {
-    init_logging()?;
+    let loghist = init_logging()?;
 
     #[cfg(feature = "server-banner")]
     server::banner::print()?;
@@ -168,7 +177,7 @@ async fn run() -> ApiResult<()> {
 
     let (client, future) = ServiceManager::spawn();
 
-    let appstate = AppState::from_config(config, client).await?;
+    let appstate = AppState::from_config(config, client, loghist).await?;
 
     install_signal_handlers(&appstate)?;
 

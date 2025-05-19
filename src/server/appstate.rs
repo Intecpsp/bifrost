@@ -5,13 +5,15 @@ use std::sync::Arc;
 use camino::Utf8Path;
 use chrono::Utc;
 use tokio::sync::watch::Sender;
-use tokio::sync::{Mutex, watch};
+use tokio::sync::{Mutex, broadcast, watch};
 
+use bifrost_api::logging::LogRecord;
 use hue::legacy_api::{ApiConfig, ApiShortConfig, Whitelist};
 use svc::manager::SvmClient;
 
 use crate::config::AppConfig;
 use crate::error::ApiResult;
+use crate::logging::LogHistory;
 use crate::model::state::{State, StateVersion};
 use crate::resource::Resources;
 use crate::server::certificate;
@@ -22,11 +24,16 @@ pub struct AppState {
     conf: Sender<AppConfig>,
     upd: Arc<Mutex<VersionUpdater>>,
     svm: SvmClient,
+    pub log: Arc<LogHistory>,
     pub res: Arc<Mutex<Resources>>,
 }
 
 impl AppState {
-    pub async fn from_config(config: AppConfig, svm: SvmClient) -> ApiResult<Self> {
+    pub async fn from_config(
+        config: AppConfig,
+        svm: SvmClient,
+        log: LogHistory,
+    ) -> ApiResult<Self> {
         let certfile = &config.bifrost.cert_file;
 
         let certpath = Utf8Path::new(certfile);
@@ -70,10 +77,13 @@ impl AppState {
 
         let conf = Sender::new(config);
 
+        let log = Arc::new(log);
+
         Ok(Self {
             conf,
             upd,
             svm,
+            log,
             res,
         })
     }
@@ -81,6 +91,11 @@ impl AppState {
     #[must_use]
     pub fn config(&self) -> Arc<AppConfig> {
         Arc::new(self.conf.borrow().clone())
+    }
+
+    #[must_use]
+    pub fn logger(&self) -> broadcast::Receiver<LogRecord> {
+        self.log.subscribe()
     }
 
     #[must_use]
