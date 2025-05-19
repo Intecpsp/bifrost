@@ -5,7 +5,7 @@ use serde_json::Value;
 use thiserror::Error;
 use uuid::Uuid;
 
-use hue::api::{LightUpdate, SceneUpdate};
+use hue::api::{GroupedLightUpdate, LightUpdate, SceneUpdate};
 
 #[derive(Clone)]
 pub struct HueClient {
@@ -105,6 +105,16 @@ impl HueClient {
 impl HueClient {
     pub async fn light_update(&self, id: Uuid, upd: LightUpdate) -> HueClientResult<()> {
         self.clip_put::<_, Value>(&format!("light/{id}"), upd)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn grouped_light_update(
+        &self,
+        id: Uuid,
+        upd: GroupedLightUpdate,
+    ) -> HueClientResult<()> {
+        self.clip_put::<_, Value>(&format!("grouped_light/{id}"), upd)
             .await?;
         Ok(())
     }
