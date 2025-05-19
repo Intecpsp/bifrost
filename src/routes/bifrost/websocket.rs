@@ -5,6 +5,7 @@ use axum::extract::ws::{Message, WebSocket};
 use axum::extract::{State, WebSocketUpgrade};
 use axum::response::Response;
 use bifrost_api::config::AppConfig;
+use bifrost_api::logging::LogRecord;
 use bytes::Bytes;
 use tokio::select;
 
@@ -94,6 +95,10 @@ impl WebSocketTask {
         Ok(Some(Update::ServiceUpdate(service)))
     }
 
+    const fn handle_log_event(&self, log_event: LogRecord) -> BifrostApiResult<Option<Update>> {
+        Ok(Some(Update::LogEvent(log_event)))
+    }
+
     async fn handle_socket(mut self) -> BifrostApiResult<()> {
         let lock = self.state.res.lock().await;
         let mut backend_events = lock.backend_event_stream();
@@ -104,12 +109,18 @@ impl WebSocketTask {
         let mut config = self.state.config_subscribe();
 
         let mut svc_events = self.mgr.subscribe().await?.1;
+        let mut log_events = self.state.logger();
 
         self.send(Update::AppConfig((*self.state.config()).clone()))
             .await?;
 
         self.send(Update::HueEvent(EventBlock::add(hue_state)))
             .await?;
+
+        let log = self.state.log.clone();
+        for evt in &*log.read().await {
+            self.send(Update::LogEvent(evt.clone())).await?;
+        }
 
         loop {
             let reply = select! {
@@ -119,6 +130,7 @@ impl WebSocketTask {
                 backend_event = backend_events.recv() => self.handle_backend_event(&backend_event?),
                 service_event = svc_events.recv() => self.handle_service_event(service_event).await,
                 hue_event = hue_events.recv() => self.handle_hue_event(hue_event?),
+                log_event = log_events.recv() => self.handle_log_event(log_event?),
             };
 
             if let Some(reply) = reply? {
