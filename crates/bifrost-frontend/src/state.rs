@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, VecDeque};
 use std::time::Duration;
 
 use bifrost_api::logging::LogRecord;
@@ -29,6 +29,7 @@ pub struct State {
     toast: Signal<ToastMaster>,
     hue: Signal<BTreeMap<Uuid, ResourceRecord>>,
     ent: Signal<Option<HueStreamLightsV2>>,
+    log: Signal<VecDeque<LogRecord>>,
 }
 
 #[allow(clippy::future_not_send)]
@@ -40,6 +41,7 @@ impl State {
         toast: Signal<ToastMaster>,
         hue: Signal<BTreeMap<Uuid, ResourceRecord>>,
         ent: Signal<Option<HueStreamLightsV2>>,
+        log: Signal<VecDeque<LogRecord>>,
     ) -> Self {
         Self {
             slist,
@@ -47,6 +49,7 @@ impl State {
             toast,
             hue,
             ent,
+            log,
         }
     }
 
@@ -163,6 +166,16 @@ impl State {
         }
     }
 
+    fn handle_log_event(&mut self, evt: LogRecord) {
+        let mut log = self.log.write();
+
+        if log.len() == log.capacity() {
+            log.pop_front();
+        }
+
+        log.push_back(evt);
+    }
+
     async fn run_connection(&mut self, mut ws: WebSocket) {
         let mut first = true;
 
@@ -201,6 +214,7 @@ impl State {
                             self.slist.write().services.insert(su.id, su);
                         }
                         Update::LogEvent(evt) => {
+                            self.handle_log_event(evt);
                         }
                     }
                 }

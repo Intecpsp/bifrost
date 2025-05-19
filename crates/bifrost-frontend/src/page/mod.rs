@@ -1,7 +1,7 @@
 pub mod footer;
 pub mod sidebar;
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, VecDeque};
 
 use dioxus::prelude::*;
 use uuid::Uuid;
@@ -97,9 +97,10 @@ pub fn Frame() -> Element {
     let toast = use_context_signal_provider(ToastMaster::new);
     let hue = use_context_signal_provider(BTreeMap::new);
     let ent = use_context_signal_provider(|| Option::None);
+    let log = use_context_signal_provider(|| VecDeque::with_capacity(1024));
 
     let _ws = use_future(move || {
-        let state = State::new(slist, config, toast, hue, ent);
+        let state = State::new(slist, config, toast, hue, ent, log);
         async move { state.run_websocket().await }
     });
 
