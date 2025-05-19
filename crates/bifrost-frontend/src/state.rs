@@ -108,6 +108,11 @@ impl State {
                                 *room = new;
                             }
                         }
+                        Resource::GroupedLight(obj) => {
+                            if let Ok(new) = event_update_apply(obj, upd.data) {
+                                *obj = new;
+                            }
+                        }
                         _ => {}
                     }
                 }
