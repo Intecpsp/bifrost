@@ -316,7 +316,7 @@ impl Resources {
             }),
             dimming: Some(DimmingUpdate { brightness: 8.7 }),
             color: Some(Stub),
-            color_temperature: Some(Stub),
+            color_temperature: None,
             color_temperature_delta: Some(Stub),
             dimming_delta: Stub,
             dynamics: Stub,

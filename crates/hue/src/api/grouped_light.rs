@@ -12,7 +12,7 @@ pub struct GroupedLight {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<Stub>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub color_temperature: Option<Stub>,
+    pub color_temperature: Option<ColorTemperatureUpdate>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color_temperature_delta: Option<Stub>,
     #[serde(default)]
@@ -31,7 +31,7 @@ impl GroupedLight {
             alert: Value::Null,
             dimming: None,
             color: Some(Stub),
-            color_temperature: Some(Stub),
+            color_temperature: None,
             color_temperature_delta: Some(Stub),
             dimming_delta: Stub,
             dynamics: Stub,
