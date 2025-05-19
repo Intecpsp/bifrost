@@ -2882,6 +2882,10 @@
     opacity: .75;
     min-width: 25em;
   }
+
+  .btn-scene {
+    text-shadow: 0 2px 3px #000, 2px 0 3px #000;
+  }
 }
 
 @keyframes skeleton {
