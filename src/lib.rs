@@ -1,6 +1,7 @@
 pub mod backend;
 pub mod config;
 pub mod error;
+pub mod logging;
 pub mod model;
 pub mod resource;
 pub mod routes;
