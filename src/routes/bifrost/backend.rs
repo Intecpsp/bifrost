@@ -1,10 +1,11 @@
 use axum::Router;
 use axum::extract::{Path, State};
 use axum::routing::post;
+use uuid::Uuid;
 
 use bifrost_api::config::Z2mServer;
+use svc::serviceid::ServiceId;
 
-use crate::backend::z2m::Z2mBackend;
 use crate::routes::bifrost::BifrostApiResult;
 use crate::routes::extractor::Json;
 use crate::server::appstate::AppState;
@@ -14,21 +15,19 @@ async fn post_backend_z2m(
     State(state): State<AppState>,
     Path(name): Path<String>,
     Json(server): Json<Z2mServer>,
-) -> BifrostApiResult<Json<()>> {
+) -> BifrostApiResult<Json<Uuid>> {
     log::info!("Adding new z2m backend: {name:?}");
 
     let mut config = (*state.config()).clone();
     config.z2m.servers.insert(name.clone(), server.clone());
     state.replace_config(config);
 
-    let svc = Z2mBackend::new(name.clone(), server, state.config(), state.res.clone())?;
-    let name = format!("z2m-{name}");
+    let uuid = state
+        .manager()
+        .start(ServiceId::instance("z2m", name))
+        .await?;
 
-    let mut mgr = state.manager();
-    mgr.register_service(&name, svc).await?;
-    mgr.start(&name).await?;
-
-    Ok(Json(()))
+    Ok(Json(uuid))
 }
 
 pub fn router() -> Router<AppState> {
