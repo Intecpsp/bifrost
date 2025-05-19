@@ -23,8 +23,13 @@ use bifrost_api::Client;
 
 use crate::component::backends::Backends;
 use crate::component::config::Config;
+use crate::component::groups::GroupsView;
+use crate::component::light_details::LightDetailView;
+use crate::component::lights::LightsView;
+use crate::component::resources::ResourcesView;
+use crate::component::service::ServicesView;
 use crate::hue_client::HueClient;
-use crate::page::{About, Frame, Groups, Index, LightDetails, Lights, Resources, Services};
+use crate::page::{About, Frame, Index};
 
 static BIFROST_SERVER: LazyLock<String> =
     LazyLock::new(|| option_env!("BIFROST_SERVER").map_or_else(base_url, ToString::to_string));
@@ -60,19 +65,19 @@ pub enum Route {
     Index,
 
     #[route("/lights")]
-    Lights,
+    LightsView,
 
     #[route("/lights/:id")]
-    LightDetails { id: Uuid },
+    LightDetailView { id: Uuid },
 
     #[route("/groups")]
-    Groups,
+    GroupsView,
 
     #[route("/services")]
-    Services,
+    ServicesView,
 
     #[route("/resources")]
-    Resources,
+    ResourcesView,
 
     #[route("/config")]
     Config,

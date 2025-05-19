@@ -5,13 +5,15 @@ use dioxus::prelude::*;
 use hue::api::{Resource, ResourceRecord};
 use uuid::Uuid;
 
-use crate::Route;
 use crate::component::light::{
     LightColorTemperature, LightColorView, LightDimming, LightGradientView, LightOnIcon,
 };
+use crate::{Route, use_context_signal};
 
 #[component]
-pub fn LightDetailView(id: Uuid, res: Signal<BTreeMap<Uuid, ResourceRecord>>) -> Element {
+pub fn LightDetailView(id: Uuid) -> Element {
+    let res = use_context_signal::<BTreeMap<Uuid, ResourceRecord>>();
+
     let Some(Resource::Light(light)) = res.read().get(&id).cloned().map(|x| x.obj) else {
         return rsx! {};
     };
@@ -20,7 +22,7 @@ pub fn LightDetailView(id: Uuid, res: Signal<BTreeMap<Uuid, ResourceRecord>>) ->
         div {
             class: "max-w-160",
 
-            Link { to: Route::Lights, class: "btn btn-primary", "Back" },
+            Link { to: Route::LightsView, class: "btn btn-primary", "Back" },
 
             h2 { class: "divider divider-primary divider-start", "On" }
             LightOnIcon { id, on: light.on }

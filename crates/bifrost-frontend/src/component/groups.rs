@@ -8,13 +8,19 @@ use hue::api::{Resource, ResourceRecord};
 use crate::component::group::GroupView;
 use crate::daisyui::Level;
 use crate::daisyui::badge::Badge;
+use crate::use_context_signal;
 
 #[component]
-pub fn GroupsView(res: Signal<BTreeMap<Uuid, ResourceRecord>>) -> Element {
+pub fn GroupsView() -> Element {
+    let rres = use_context_signal::<BTreeMap<Uuid, ResourceRecord>>();
+    let res = &*rres.read();
+
     rsx! {
         div {
             class: "grid gap-4",
-            for (uuid, item) in &*res.read() {
+            class: "max-w-200",
+            for (uuid, item) in res {
+
                 if let Resource::Room(room) = &item.obj {
                     div {
                         class: "max-w-220",
@@ -50,7 +56,7 @@ pub fn GroupsView(res: Signal<BTreeMap<Uuid, ResourceRecord>>) -> Element {
                         }
                         div {
                             class: "bg-base-300 p-5 rounded-b-xl",
-                            GroupView { res, id: *uuid, room: room.clone() }
+                            GroupView { res: rres, id: *uuid, room: room.clone() }
                         }
                     }
                 }

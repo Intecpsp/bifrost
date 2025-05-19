@@ -36,14 +36,14 @@ pub fn Sidebar() -> Element {
                 ul {
                     class: "menu text-lg font-bold grow w-full *:gap-0",
 
-                    li { Link { to: Route::Index,                     "Main page"  } }
-                    li { Link { to: Route::Lights,    GrInfo {}       "Lights"     } }
-                    li { Link { to: Route::Groups,    GrIteration {}  "Groups"     } }
-                    li { Link { to: Route::Resources, GrStorage {}    "Resources"  } }
-                    li { Link { to: Route::Services,  GrServices {}   "Services"   } }
-                    li { Link { to: Route::Backends,  GrAction {}     "Backends"   } }
-                    li { Link { to: Route::Config,    GrSystem {}     "Config"     } }
-                    li { Link { to: Route::About,     GrStatusInfo {} "About page" } }
+                    li { Link { to: Route::Index,                         "Main page"  } }
+                    li { Link { to: Route::LightsView,    GrInfo {}       "Lights"     } }
+                    li { Link { to: Route::GroupsView,    GrIteration {}  "Groups"     } }
+                    li { Link { to: Route::ResourcesView, GrStorage {}    "Resources"  } }
+                    li { Link { to: Route::ServicesView,  GrServices {}   "Services"   } }
+                    li { Link { to: Route::Backends,      GrAction {}     "Backends"   } }
+                    li { Link { to: Route::Config,        GrSystem {}     "Config"     } }
+                    li { Link { to: Route::About,         GrStatusInfo {} "About page" } }
                 }
 
                 if let Some(ent) = &*ent.read() {

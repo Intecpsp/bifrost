@@ -5,11 +5,13 @@ use uuid::Uuid;
 
 use hue::api::{Resource, ResourceRecord};
 
-use crate::Route;
 use crate::component::light::LightView;
+use crate::{Route, use_context_signal};
 
 #[component]
-pub fn LightsView(res: Signal<BTreeMap<Uuid, ResourceRecord>>) -> Element {
+pub fn LightsView() -> Element {
+    let res = use_context_signal::<BTreeMap<Uuid, ResourceRecord>>();
+
     rsx! {
         h2 { class: "card-title", "Lights" }
 
@@ -26,7 +28,7 @@ pub fn LightsView(res: Signal<BTreeMap<Uuid, ResourceRecord>>) -> Element {
                                 class: "flex gap-4 *:text-nowrap",
                                 Link {
                                     class: "badge badge-soft badge-info font-mono",
-                                    to: Route::LightDetails { id: *uuid },
+                                    to: Route::LightDetailView { id: *uuid },
                                     { item.id_v1.as_deref().unwrap_or("-") }
                                 },
                                 "|",

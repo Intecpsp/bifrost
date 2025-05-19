@@ -2,10 +2,13 @@ use std::collections::BTreeMap;
 
 use dioxus::prelude::*;
 use serde::Serialize;
-use serde_json::{Serializer, Value, ser::PrettyFormatter};
+use serde_json::ser::PrettyFormatter;
+use serde_json::{Serializer, Value};
 use uuid::Uuid;
 
 use hue::api::ResourceRecord;
+
+use crate::use_context_signal;
 
 #[component]
 pub fn Collapse(header: Element, content: Element) -> Element {
@@ -66,7 +69,9 @@ pub fn Highlight(value: Value) -> Element {
 
 #[allow(clippy::option_if_let_else)]
 #[component]
-pub fn ResourcesView(res: Signal<BTreeMap<Uuid, ResourceRecord>>) -> Element {
+pub fn ResourcesView() -> Element {
+    let res = use_context_signal::<BTreeMap<Uuid, ResourceRecord>>();
+
     rsx! {
         h2 { class: "card-title", "Resources" }
 
