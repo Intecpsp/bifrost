@@ -60,6 +60,7 @@ impl State {
         self.hue.write().clear();
     }
 
+    #[allow(clippy::cognitive_complexity)]
     fn handle_hue_event(&mut self, he: EventBlock) {
         match he.event {
             Event::Add(add) => {
@@ -106,6 +107,11 @@ impl State {
                             if let Ok(new) = event_update_apply(room, upd.data) {
                                 /* tracing::info!("upd: {upd:#?}"); */
                                 *room = new;
+                            }
+                        }
+                        Resource::Scene(scene) => {
+                            if let Ok(new) = event_update_apply(scene, upd.data) {
+                                *scene = new;
                             }
                         }
                         Resource::GroupedLight(obj) => {
