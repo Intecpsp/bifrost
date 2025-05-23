@@ -118,6 +118,18 @@ fn css_scene_style(scene: &Scene) -> String {
                 parts.push(xy);
             }
         }
+    } else {
+        for act in &scene.actions {
+            if let Some(c) = act.action.color {
+                parts.push(c.xy);
+            } else if let Some(ColorTemperatureUpdate { mirek: Some(c) }) =
+                act.action.color_temperature
+            {
+                let kelvin = mirek_to_kelvin(u32::from(c));
+                let xy = cct_to_xy(f64::from(kelvin));
+                parts.push(xy);
+            }
+        }
     }
 
     let gradient = parts
