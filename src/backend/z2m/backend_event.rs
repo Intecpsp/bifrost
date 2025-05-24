@@ -9,8 +9,8 @@ use uuid::Uuid;
 use bifrost_api::backend::BackendRequest;
 use hue::api::{
     Entertainment, EntertainmentConfiguration, GroupedLight, GroupedLightUpdate, Light,
-    LightEffectsV2Update, LightGradientMode, LightUpdate, RType, Resource, ResourceLink, Room,
-    RoomUpdate, Scene, SceneActive, SceneStatus, SceneStatusEnum, SceneUpdate,
+    LightEffectsV2Update, LightGradientMode, LightGradientPoint, LightUpdate, RType, Resource,
+    ResourceLink, Room, RoomUpdate, Scene, SceneActive, SceneStatus, SceneStatusEnum, SceneUpdate,
     ZigbeeDeviceDiscoveryUpdate,
 };
 use hue::error::HueError;
@@ -31,7 +31,7 @@ impl Z2mBackend {
         if let Some(grad) = &upd.gradient {
             hz = hz.with_gradient_colors(
                 grad.mode.map_or(GradientStyle::Linear, Into::into),
-                grad.points.iter().map(|c| c.color.xy).collect(),
+                grad.points.iter().map(LightGradientPoint::color).collect(),
             )?;
 
             hz = hz.with_gradient_params(GradientParams {
@@ -55,8 +55,8 @@ impl Z2mBackend {
             if let Some(speed) = &act.parameters.speed {
                 hz = hz.with_effect_speed(speed.unit_to_u8_clamped());
             }
-            if let Some(mirek) = &act.parameters.color_temperature.and_then(|ct| ct.mirek) {
-                hz = hz.with_color_mirek(*mirek);
+            if let Some(mirek) = act.parameters.color_temperature_mirek() {
+                hz = hz.with_color_mirek(mirek);
             }
             if let Some(color) = &act.parameters.color {
                 hz = hz.with_color_xy(color.xy);
@@ -93,10 +93,10 @@ impl Z2mBackend {
 
         /* step 1: send generic light update */
         let mut payload = DeviceUpdate::default()
-            .with_state(upd.on.map(|on| on.on))
+            .with_state(upd.on())
             .with_brightness(upd.dimming.map(|dim| dim.brightness / 100.0 * 254.0))
-            .with_color_temp(upd.color_temperature.and_then(|ct| ct.mirek))
-            .with_color_xy(upd.color.map(|col| col.xy));
+            .with_color_temp(upd.color_temperature_mirek())
+            .with_color_xy(upd.color_xy());
 
         // We don't want to send gradient updates twice, but if hue
         // effects are not supported for this light, this is the best
