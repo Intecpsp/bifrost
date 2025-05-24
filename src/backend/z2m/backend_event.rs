@@ -179,6 +179,7 @@ impl Z2mBackend {
         let mut lock = self.state.lock().await;
 
         let scene = lock.get::<Scene>(link)?;
+        let room = scene.group;
 
         let index = lock
             .aux_get(link)?
@@ -201,7 +202,6 @@ impl Z2mBackend {
                     })?;
                 }
 
-                let room = lock.get::<Scene>(link)?.group;
                 drop(lock);
 
                 if let Some(topic) = self.rmap.get(&room).cloned() {
