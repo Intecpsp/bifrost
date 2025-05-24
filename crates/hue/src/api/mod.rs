@@ -227,7 +227,7 @@ macro_rules! resource_conversion_impl {
                 if let Resource::$name(obj) = value {
                     Ok(obj)
                 } else {
-                    Err(HueError::WrongType(RType::Light, value.rtype()))
+                    Err(HueError::WrongType(RType::$name, value.rtype()))
                 }
             }
         }
@@ -239,7 +239,7 @@ macro_rules! resource_conversion_impl {
                 if let Resource::$name(obj) = value {
                     Ok(obj)
                 } else {
-                    Err(HueError::WrongType(RType::Light, value.rtype()))
+                    Err(HueError::WrongType(RType::$name, value.rtype()))
                 }
             }
         }
@@ -251,7 +251,7 @@ macro_rules! resource_conversion_impl {
                 if let Resource::$name(obj) = value {
                     Ok(obj)
                 } else {
-                    Err(HueError::WrongType(RType::Light, value.rtype()))
+                    Err(HueError::WrongType(RType::$name, value.rtype()))
                 }
             }
         }
