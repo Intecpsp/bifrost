@@ -101,6 +101,11 @@ impl ResourceExt for BridgeHome {
     fn rtype(&self) -> RType {
         RType::BridgeHome
     }
+
+    fn delete_link(&mut self, rlink: &ResourceLink) {
+        self.children.remove(rlink);
+        self.services.remove(rlink);
+    }
 }
 
 impl ResourceExt for Button {
@@ -116,6 +121,10 @@ impl ResourceExt for Button {
 impl ResourceExt for Device {
     fn rtype(&self) -> RType {
         RType::Device
+    }
+
+    fn delete_link(&mut self, rlink: &ResourceLink) {
+        self.services.remove(rlink);
     }
 }
 
@@ -152,6 +161,15 @@ impl ResourceExt for Entertainment {
 impl ResourceExt for EntertainmentConfiguration {
     fn rtype(&self) -> RType {
         RType::EntertainmentConfiguration
+    }
+
+    fn delete_link(&mut self, rlink: &ResourceLink) {
+        self.locations
+            .service_locations
+            .retain(|sl| sl.service != *rlink);
+        self.channels
+            .retain(|chan| !chan.members.iter().any(|c| c.service == *rlink));
+        self.light_services.retain(|ls| ls != rlink);
     }
 }
 
@@ -265,6 +283,11 @@ impl ResourceExt for Room {
     fn rtype(&self) -> RType {
         RType::Room
     }
+
+    fn delete_link(&mut self, rlink: &ResourceLink) {
+        self.children.remove(rlink);
+        self.services.remove(rlink);
+    }
 }
 
 impl ResourceExt for Scene {
@@ -322,6 +345,11 @@ impl ResourceExt for ZigbeeDeviceDiscovery {
 impl ResourceExt for Zone {
     fn rtype(&self) -> RType {
         RType::Zone
+    }
+
+    fn delete_link(&mut self, rlink: &ResourceLink) {
+        self.children.remove(rlink);
+        self.services.remove(rlink);
     }
 }
 
