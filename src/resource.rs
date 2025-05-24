@@ -109,7 +109,7 @@ impl Resources {
     where
         for<'a> &'a mut T: TryFrom<&'a mut Resource, Error = HueError>,
     {
-        let id_v1 = self.id_v1_scope(id, self.state.get(id)?);
+        let id_v1 = self.id_v1_scope(id, self.state.get_id(id)?);
         let resource = self.state.get_mut(id)?;
 
         let obj: &mut T = resource.try_into()?;
@@ -238,7 +238,7 @@ impl Resources {
         })?;
 
         // Get id_v1 before deleting
-        let id_v1 = self.id_v1_scope(&link.rid, self.state.get(&link.rid)?);
+        let id_v1 = self.id_v1_scope(&link.rid, self.state.get_id(&link.rid)?);
 
         // Remove resource from state database
         self.state.remove(&link.rid)?;
@@ -413,7 +413,7 @@ impl Resources {
     where
         &'a T: TryFrom<&'a Resource, Error = HueError>,
     {
-        self.state.get(&id)?.try_into()
+        self.state.get_id(&id)?.try_into()
     }
 
     /*
@@ -519,7 +519,7 @@ impl Resources {
 
     pub fn get_resource_by_id(&self, id: &Uuid) -> HueResult<ResourceRecord> {
         self.state
-            .get(id)
+            .get_id(id)
             .map(|res| self.make_resource_record(id, res))
     }
 

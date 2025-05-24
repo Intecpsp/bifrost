@@ -217,7 +217,7 @@ impl State {
         self.res.get(id)
     }
 
-    pub fn get(&self, id: &Uuid) -> HueResult<&Resource> {
+    pub fn get_id(&self, id: &Uuid) -> HueResult<&Resource> {
         self.try_get(id).ok_or(HueError::NotFound(*id))
     }
 
