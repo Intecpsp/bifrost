@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use serde_yml::Value;
 use uuid::Uuid;
 
-use hue::api::{DeviceArchetype, Resource, ResourceLink};
+use hue::api::{DeviceArchetype, Resource, ResourceExt, ResourceLink};
 use hue::error::{HueError, HueResult};
 use hue::version::SwVersion;
 

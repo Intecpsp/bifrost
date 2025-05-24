@@ -9,7 +9,7 @@ use hue::api::{
     EntertainmentConfigurationStatus, EntertainmentConfigurationStreamMembers,
     EntertainmentConfigurationStreamProxy, EntertainmentConfigurationStreamProxyMode,
     EntertainmentConfigurationStreamProxyUpdate, EntertainmentConfigurationUpdate, Light,
-    LightMode, Position, RType, Resource, ResourceLink,
+    LightMode, Position, RType, Resource, ResourceExt, ResourceLink,
 };
 
 use crate::error::ApiResult;

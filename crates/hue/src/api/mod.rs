@@ -1,6 +1,7 @@
 mod device;
 mod entertainment;
 mod entertainment_config;
+mod ext;
 mod grouped_light;
 mod light;
 mod resource;
@@ -10,8 +11,6 @@ mod stream;
 mod stubs;
 mod update;
 mod zigbee_device_discovery;
-
-pub mod ext;
 
 pub use device::{Device, DeviceArchetype, DeviceProductData, DeviceUpdate, Identify};
 pub use entertainment::{Entertainment, EntertainmentSegment, EntertainmentSegments};
@@ -26,6 +25,7 @@ pub use entertainment_config::{
     EntertainmentConfigurationStreamProxyMode, EntertainmentConfigurationStreamProxyUpdate,
     EntertainmentConfigurationType, EntertainmentConfigurationUpdate, Position,
 };
+pub use ext::ResourceExt;
 pub use grouped_light::{GroupedLight, GroupedLightUpdate};
 pub use light::{
     ColorGamut, ColorTemperature, ColorTemperatureUpdate, ColorUpdate, Delta, Dimming,
@@ -124,97 +124,6 @@ pub enum Resource {
     ServiceGroup(ServiceGroup),
     Tamper(Tamper),
     ZgpConnectivity(ZgpConnectivity),
-}
-
-impl Resource {
-    #[must_use]
-    pub const fn rtype(&self) -> RType {
-        match self {
-            Self::BehaviorInstance(_) => RType::BehaviorInstance,
-            Self::BehaviorScript(_) => RType::BehaviorScript,
-            Self::Bridge(_) => RType::Bridge,
-            Self::BridgeHome(_) => RType::BridgeHome,
-            Self::Button(_) => RType::Button,
-            Self::CameraMotion(_) => RType::CameraMotion,
-            Self::Contact(_) => RType::Contact,
-            Self::Device(_) => RType::Device,
-            Self::DevicePower(_) => RType::DevicePower,
-            Self::DeviceSoftwareUpdate(_) => RType::DeviceSoftwareUpdate,
-            Self::Entertainment(_) => RType::Entertainment,
-            Self::EntertainmentConfiguration(_) => RType::EntertainmentConfiguration,
-            Self::GeofenceClient(_) => RType::GeofenceClient,
-            Self::Geolocation(_) => RType::Geolocation,
-            Self::GroupedLight(_) => RType::GroupedLight,
-            Self::GroupedLightLevel(_) => RType::GroupedLightLevel,
-            Self::GroupedMotion(_) => RType::GroupedMotion,
-            Self::Homekit(_) => RType::Homekit,
-            Self::Light(_) => RType::Light,
-            Self::LightLevel(_) => RType::LightLevel,
-            Self::Matter(_) => RType::Matter,
-            Self::MatterFabric(_) => RType::MatterFabric,
-            Self::Motion(_) => RType::Motion,
-            Self::PrivateGroup(_) => RType::PrivateGroup,
-            Self::PublicImage(_) => RType::PublicImage,
-            Self::RelativeRotary(_) => RType::RelativeRotary,
-            Self::Room(_) => RType::Room,
-            Self::Scene(_) => RType::Scene,
-            Self::ServiceGroup(_) => RType::ServiceGroup,
-            Self::SmartScene(_) => RType::SmartScene,
-            Self::Tamper(_) => RType::Tamper,
-            Self::Taurus(_) => RType::Taurus,
-            Self::Temperature(_) => RType::Temperature,
-            Self::ZgpConnectivity(_) => RType::ZgpConnectivity,
-            Self::ZigbeeConnectivity(_) => RType::ZigbeeConnectivity,
-            Self::ZigbeeDeviceDiscovery(_) => RType::ZigbeeDeviceDiscovery,
-            Self::Zone(_) => RType::Zone,
-        }
-    }
-
-    #[allow(clippy::match_same_arms)]
-    #[must_use]
-    pub const fn owner(&self) -> Option<ResourceLink> {
-        match self {
-            Self::BehaviorInstance(_) => None,
-            Self::BehaviorScript(_) => None,
-            Self::Bridge(obj) => Some(obj.owner),
-            Self::BridgeHome(_) => None,
-            Self::Button(obj) => Some(obj.owner),
-            Self::Device(_) => None,
-            Self::DevicePower(obj) => Some(obj.owner),
-            Self::DeviceSoftwareUpdate(obj) => Some(obj.owner),
-            Self::Entertainment(obj) => Some(obj.owner),
-            Self::EntertainmentConfiguration(_) => None,
-            Self::GeofenceClient(_) => None,
-            Self::Geolocation(_) => None,
-            Self::GroupedLight(obj) => Some(obj.owner),
-            Self::GroupedLightLevel(obj) => Some(obj.owner),
-            Self::GroupedMotion(obj) => Some(obj.owner),
-            Self::Homekit(_) => None,
-            Self::Light(obj) => Some(obj.owner),
-            Self::LightLevel(obj) => Some(obj.owner),
-            Self::Matter(_) => None,
-            Self::Motion(obj) => Some(obj.owner),
-            Self::PrivateGroup(_) => None,
-            Self::PublicImage(_) => None,
-            Self::RelativeRotary(obj) => Some(obj.owner),
-            Self::Room(_) => None,
-            Self::Scene(_) => None,
-            Self::SmartScene(_) => None,
-            Self::Taurus(obj) => Some(obj.owner),
-            Self::Temperature(obj) => Some(obj.owner),
-            Self::ZigbeeConnectivity(obj) => Some(obj.owner),
-            Self::ZigbeeDeviceDiscovery(obj) => Some(obj.owner),
-            Self::Zone(_) => None,
-
-            /* Unmapped variants */
-            Self::CameraMotion(_) => None,
-            Self::Contact(_) => None,
-            Self::MatterFabric(_) => None,
-            Self::ServiceGroup(_) => None,
-            Self::Tamper(_) => None,
-            Self::ZgpConnectivity(_) => None,
-        }
-    }
 }
 
 #[macro_export]
