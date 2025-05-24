@@ -103,11 +103,8 @@ impl SceneLearn {
                     mode: None,
                     points: grad
                         .iter()
-                        .map(|p| LightGradientPoint {
-                            color: ColorUpdate {
-                                xy: HexColor::to_xy_color(p),
-                            },
-                        })
+                        .map(HexColor::to_xy_color)
+                        .map(LightGradientPoint::xy)
                         .collect(),
                 })
             } else {
