@@ -11,6 +11,8 @@ mod stubs;
 mod update;
 mod zigbee_device_discovery;
 
+pub mod ext;
+
 pub use device::{Device, DeviceArchetype, DeviceProductData, DeviceUpdate, Identify};
 pub use entertainment::{Entertainment, EntertainmentSegment, EntertainmentSegments};
 pub use entertainment_config::{
