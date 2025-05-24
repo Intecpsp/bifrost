@@ -41,7 +41,6 @@ pub use scene::{
     Scene, SceneAction, SceneActionElement, SceneActive, SceneMetadata, SceneRecall, SceneStatus,
     SceneStatusEnum, SceneUpdate,
 };
-use serde::ser::SerializeMap;
 pub use stream::HueStreamKey;
 pub use stubs::{
     BehaviorInstance, BehaviorInstanceMetadata, BehaviorScript, Bridge, BridgeHome, Button,
@@ -59,6 +58,7 @@ pub use zigbee_device_discovery::{
 
 use std::fmt::Debug;
 
+use serde::ser::SerializeMap;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
