@@ -59,7 +59,9 @@ macro_rules! impl_resource_dispatch {
 pub trait ResourceExt {
     fn rtype(&self) -> RType;
 
-    fn owner(&self) -> Option<ResourceLink>;
+    fn owner(&self) -> Option<ResourceLink> {
+        None
+    }
 
     fn delete_link(&mut self, _rlink: &ResourceLink) {}
 }
@@ -68,19 +70,11 @@ impl ResourceExt for BehaviorInstance {
     fn rtype(&self) -> RType {
         RType::BehaviorInstance
     }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
-    }
 }
 
 impl ResourceExt for BehaviorScript {
     fn rtype(&self) -> RType {
         RType::BehaviorScript
-    }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
     }
 }
 
@@ -98,10 +92,6 @@ impl ResourceExt for BridgeHome {
     fn rtype(&self) -> RType {
         RType::BridgeHome
     }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
-    }
 }
 
 impl ResourceExt for Button {
@@ -117,10 +107,6 @@ impl ResourceExt for Button {
 impl ResourceExt for Device {
     fn rtype(&self) -> RType {
         RType::Device
-    }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
     }
 }
 
@@ -158,29 +144,17 @@ impl ResourceExt for EntertainmentConfiguration {
     fn rtype(&self) -> RType {
         RType::EntertainmentConfiguration
     }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
-    }
 }
 
 impl ResourceExt for GeofenceClient {
     fn rtype(&self) -> RType {
         RType::GeofenceClient
     }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
-    }
 }
 
 impl ResourceExt for Geolocation {
     fn rtype(&self) -> RType {
         RType::Geolocation
-    }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
     }
 }
 
@@ -218,10 +192,6 @@ impl ResourceExt for Homekit {
     fn rtype(&self) -> RType {
         RType::Homekit
     }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
-    }
 }
 
 impl ResourceExt for Light {
@@ -248,10 +218,6 @@ impl ResourceExt for Matter {
     fn rtype(&self) -> RType {
         RType::Matter
     }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
-    }
 }
 
 impl ResourceExt for Motion {
@@ -268,19 +234,11 @@ impl ResourceExt for PrivateGroup {
     fn rtype(&self) -> RType {
         RType::PrivateGroup
     }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
-    }
 }
 
 impl ResourceExt for PublicImage {
     fn rtype(&self) -> RType {
         RType::PublicImage
-    }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
     }
 }
 
@@ -298,29 +256,17 @@ impl ResourceExt for Room {
     fn rtype(&self) -> RType {
         RType::Room
     }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
-    }
 }
 
 impl ResourceExt for Scene {
     fn rtype(&self) -> RType {
         RType::Scene
     }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
-    }
 }
 
 impl ResourceExt for SmartScene {
     fn rtype(&self) -> RType {
         RType::SmartScene
-    }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
     }
 }
 
@@ -368,19 +314,11 @@ impl ResourceExt for Zone {
     fn rtype(&self) -> RType {
         RType::Zone
     }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
-    }
 }
 
 impl ResourceExt for CameraMotion {
     fn rtype(&self) -> RType {
         RType::CameraMotion
-    }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
     }
 }
 
@@ -388,19 +326,11 @@ impl ResourceExt for Contact {
     fn rtype(&self) -> RType {
         RType::Contact
     }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
-    }
 }
 
 impl ResourceExt for MatterFabric {
     fn rtype(&self) -> RType {
         RType::MatterFabric
-    }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
     }
 }
 
@@ -408,28 +338,16 @@ impl ResourceExt for ServiceGroup {
     fn rtype(&self) -> RType {
         RType::ServiceGroup
     }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
-    }
 }
 
 impl ResourceExt for Tamper {
     fn rtype(&self) -> RType {
         RType::Tamper
     }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
-    }
 }
 
 impl ResourceExt for ZgpConnectivity {
     fn rtype(&self) -> RType {
         RType::ZgpConnectivity
-    }
-
-    fn owner(&self) -> Option<ResourceLink> {
-        None
     }
 }
