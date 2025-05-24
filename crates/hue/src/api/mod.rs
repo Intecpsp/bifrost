@@ -117,12 +117,12 @@ pub enum Resource {
     Zone(Zone),
 
     /* Unmapped variants */
-    CameraMotion(Value),
-    Contact(Value),
-    MatterFabric(Value),
-    ServiceGroup(Value),
-    Tamper(Value),
-    ZgpConnectivity(Value),
+    CameraMotion(CameraMotion),
+    Contact(Contact),
+    MatterFabric(MatterFabric),
+    ServiceGroup(ServiceGroup),
+    Tamper(Tamper),
+    ZgpConnectivity(ZgpConnectivity),
 }
 
 impl Resource {
