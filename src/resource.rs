@@ -238,24 +238,13 @@ impl Resources {
         })?;
 
         // Get id_v1 before deleting
-        let id_v1 = self.id_v1_scope(&link.rid, self.state.get_id(&link.rid)?);
+        let id_v1 = self.id_v1_scope(&link.rid, self.state.get(link)?);
 
         // Remove resource from state database
         self.state.remove(&link.rid)?;
 
         // Find ids of all resources owned by the deleted node
-        let owned_by = self
-            .state
-            .res
-            .iter()
-            .filter_map(|(rid, res)| {
-                if res.owner() == Some(*link) {
-                    Some(ResourceLink::new(*rid, res.rtype()))
-                } else {
-                    None
-                }
-            })
-            .collect_vec();
+        let owned_by = self.state.all_owned_resources(link);
 
         // Delete all resources owned by the deleted node
         for owned in owned_by {
@@ -406,7 +395,7 @@ impl Resources {
     where
         &'a T: TryFrom<&'a Resource, Error = HueError>,
     {
-        self.get_id(link.rid)
+        self.state.get(link)?.try_into()
     }
 
     pub fn get_id<'a, T>(&'a self, id: Uuid) -> HueResult<&'a T>
@@ -510,11 +499,8 @@ impl Resources {
 
     pub fn get_resource(&self, rlink: &ResourceLink) -> HueResult<ResourceRecord> {
         self.state
-            .res
-            .get(&rlink.rid)
-            .filter(|res| res.rtype() == rlink.rtype)
+            .get(rlink)
             .map(|res| self.make_resource_record(&rlink.rid, res))
-            .ok_or(HueError::NotFound(rlink.rid))
     }
 
     pub fn get_resource_by_id(&self, id: &Uuid) -> HueResult<ResourceRecord> {
