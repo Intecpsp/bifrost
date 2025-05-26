@@ -212,6 +212,10 @@ impl State {
         self.aux.insert(id, aux);
     }
 
+    pub fn aux_remove(&mut self, id: &Uuid) -> Option<AuxData> {
+        self.aux.remove(id)
+    }
+
     #[must_use]
     pub fn try_get(&self, id: &Uuid) -> Option<&Resource> {
         self.res.get(id)

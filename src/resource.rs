@@ -102,6 +102,10 @@ impl Resources {
         self.state.aux_set(link.rid, aux);
     }
 
+    pub fn aux_remove(&mut self, link: &ResourceLink) -> Option<AuxData> {
+        self.state.aux_remove(&link.rid)
+    }
+
     pub fn try_update<T: Serialize>(
         &mut self,
         id: &Uuid,
