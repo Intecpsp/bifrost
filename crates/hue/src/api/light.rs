@@ -706,6 +706,11 @@ impl LightUpdate {
     }
 
     #[must_use]
+    pub fn dimming(&self) -> Option<f64> {
+        self.dimming.map(|dim| dim.brightness)
+    }
+
+    #[must_use]
     pub fn color_temperature_mirek(&self) -> Option<u16> {
         self.color_temperature.and_then(|ct| ct.mirek)
     }

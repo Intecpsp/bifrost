@@ -103,6 +103,16 @@ impl GroupedLightUpdate {
             ..self
         }
     }
+
+    #[must_use]
+    pub fn on(&self) -> Option<bool> {
+        self.on.map(|on| on.on)
+    }
+
+    #[must_use]
+    pub fn dimming(&self) -> Option<f64> {
+        self.dimming.map(|dim| dim.brightness)
+    }
 }
 
 /* conversion from v1 api */
