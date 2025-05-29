@@ -166,6 +166,15 @@ async fn run() -> ApiResult<()> {
     let config = config::parse("config.yaml".into())?;
     log::debug!("Configuration loaded successfully");
 
+    if !config.has_backends() {
+        log::warn!("{}", "-".repeat(80));
+        log::warn!("No backends configured in config!");
+        log::warn!("Bifrost will run, but cannot control any lights.");
+        log::warn!("");
+        log::warn!(" ** Please configure at least one backend to use Bifrost **");
+        log::warn!("{}", "-".repeat(80));
+    }
+
     let (client, future) = ServiceManager::spawn();
 
     let appstate = AppState::from_config(config, client).await?;
