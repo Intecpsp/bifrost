@@ -10,6 +10,8 @@ use bifrost_api::backend::BackendRequest;
 use hue::event::EventBlock;
 use svc::error::SvcError;
 
+use crate::backend::wled::error::WledError;
+
 #[derive(Error, Debug)]
 pub enum ApiError {
     /* mapped errors */
@@ -118,6 +120,9 @@ pub enum ApiError {
 
     #[error("Unexpected z2m message: {0:?}")]
     UnexpectedZ2mReply(tokio_tungstenite::tungstenite::Message),
+
+    #[error(transparent)]
+    WledError(#[from] WledError),
 
     /* hue api v2 errors */
     #[error("Failed to get firmware version reply from update server")]
