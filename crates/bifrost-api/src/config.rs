@@ -74,6 +74,13 @@ pub struct AppConfig {
     pub rooms: BTreeMap<String, RoomConfig>,
 }
 
+impl AppConfig {
+    #[must_use]
+    pub fn has_backends(&self) -> bool {
+        !self.z2m.servers.is_empty() || !self.wled.servers.is_empty()
+    }
+}
+
 impl Z2mServer {
     #[must_use]
     pub fn get_url(&self) -> Url {
