@@ -179,6 +179,45 @@ pub struct DDPHeader {
 impl DDPHeader {
     pub const SIZE: usize = size_of::<<Self as PackedStruct>::ByteArray>();
 
+    #[must_use]
+    pub const fn new(flags: Flags, datatype: DataType, bits: BitsPerChannel) -> Self {
+        Self {
+            flags,
+            sequence: 1,
+            c: false,
+            datatype,
+            bits,
+            id: Id::Default,
+            offset: 0,
+            length: 0,
+        }
+    }
+
+    #[must_use]
+    pub const fn with_flags(self, flags: Flags) -> Self {
+        Self { flags, ..self }
+    }
+
+    #[must_use]
+    pub const fn with_sequence(self, sequence: u8) -> Self {
+        Self { sequence, ..self }
+    }
+
+    #[must_use]
+    pub const fn with_id(self, id: Id) -> Self {
+        Self { id, ..self }
+    }
+
+    #[must_use]
+    pub const fn with_offset(self, offset: u32) -> Self {
+        Self { offset, ..self }
+    }
+
+    #[must_use]
+    pub const fn with_length(self, length: u16) -> Self {
+        Self { length, ..self }
+    }
+
     pub fn pack(&self) -> Result<[u8; Self::SIZE], PackingError> {
         let mut res = [0u8; Self::SIZE];
         self.pack_to_slice(&mut res)?;
