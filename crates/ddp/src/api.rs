@@ -1,5 +1,7 @@
 use packed_struct::prelude::*;
 
+pub const DDP_PORT: u16 = 4048;
+
 #[derive(PrimitiveEnum_u8, Debug, Clone, Copy)]
 pub enum Version {
     V1 = 0b01,
