@@ -158,6 +158,7 @@ impl WledBackend {
         }
     }
 
+    #[allow(clippy::cast_possible_truncation)]
     pub async fn add_room(&mut self, info: &WledInfo) -> ApiResult<()> {
         let mac = &info.mac;
 
@@ -182,7 +183,9 @@ impl WledBackend {
         }
 
         let room = Room {
-            children: btreeset![self.device_link(0), self.device_link(1)],
+            children: (0..info.leds.seglc.len())
+                .map(|idx| self.device_link(idx as u8))
+                .collect(),
             metadata,
             services: btreeset![link_glight],
         };
