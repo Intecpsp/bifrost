@@ -2,21 +2,24 @@
 
 use std::sync::Arc;
 
+use ddp::api::DDP_PORT;
 use hue::clamp::Clamp;
+use tokio::net::UdpSocket;
 use uuid::Uuid;
 
 use bifrost_api::backend::BackendRequest;
 use hue::api::{
-    GroupedLightUpdate, LightEffect, LightEffectsV2Update, LightUpdate, RType, Resource,
-    ResourceLink, RoomUpdate, Scene, SceneActive, SceneStatus, SceneStatusEnum, SceneUpdate,
-    ZigbeeDeviceDiscoveryUpdate,
+    EntertainmentConfiguration, GroupedLightUpdate, Light, LightEffect, LightEffectsV2Update,
+    LightUpdate, MirekSchema, RType, Resource, ResourceLink, RoomUpdate, Scene, SceneActive,
+    SceneStatus, SceneStatusEnum, SceneUpdate, ZigbeeDeviceDiscoveryUpdate,
 };
 use hue::stream::HueStreamLightsV2;
 use wled::{Color, Colors, StateSegUpdate, StateUpdate};
 
 use crate::backend::wled::WledBackend;
+use crate::backend::wled::entertainment::EntStream;
 use crate::backend::wled::websocket::WledWebSocket;
-use crate::error::ApiResult;
+use crate::error::{ApiError, ApiResult};
 use crate::model::state::AuxData;
 
 #[allow(clippy::match_same_arms)]
@@ -261,23 +264,51 @@ impl WledBackend {
         Ok(())
     }
 
-    async fn backend_entertainment_start(
-        &mut self,
-        _wledws: &mut WledWebSocket,
-        _ent_id: &Uuid,
-    ) -> ApiResult<()> {
+    async fn backend_entertainment_start(&mut self, ent_id: &Uuid) -> ApiResult<()> {
+        let Some(ip) = self.info.as_ref().and_then(|info| info.ip) else {
+            log::error!("WLED did not have IP set in json info. Cannot start stream.");
+            return Err(ApiError::EntStreamInitError);
+        };
+
+        log::trace!("[{}] Entertainment start", self.name);
+        let lock = self.state.lock().await;
+
+        let ent: &EntertainmentConfiguration = lock.get_id(*ent_id)?;
+
+        let mut chans = ent.channels.clone();
+
+        chans.sort_by_key(|c| c.channel_id);
+
+        drop(lock);
+
+        let socket = UdpSocket::bind("0.0.0.0:0").await?;
+        socket.connect((ip, DDP_PORT)).await?;
+
+        let mut es = EntStream::new(socket);
+
+        log::info!("Starting entertainment mode stream at {} fps", self.fps);
+
+        es.start_stream()?;
+
+        self.entstream = Some(es);
+
         Ok(())
     }
 
-    async fn backend_entertainment_frame(
-        &mut self,
-        _wledws: &mut WledWebSocket,
-        _frame: &HueStreamLightsV2,
-    ) -> ApiResult<()> {
+    async fn backend_entertainment_frame(&mut self, frame: &HueStreamLightsV2) -> ApiResult<()> {
+        if let Some(es) = &mut self.entstream {
+            if self.throttle.tick() {
+                es.frame(frame).await?;
+            }
+        }
+
         Ok(())
     }
 
     async fn backend_entertainment_stop(&mut self, _wledws: &mut WledWebSocket) -> ApiResult<()> {
+        if let Some(mut es) = self.entstream.take() {
+            es.stop_stream()?;
+        }
         Ok(())
     }
 
@@ -319,11 +350,11 @@ impl WledBackend {
             BackendRequest::Delete(link) => self.backend_delete(wledws, link).await,
 
             BackendRequest::EntertainmentStart(ent_id) => {
-                self.backend_entertainment_start(wledws, ent_id).await
+                self.backend_entertainment_start(ent_id).await
             }
 
             BackendRequest::EntertainmentFrame(frame) => {
-                self.backend_entertainment_frame(wledws, frame).await
+                self.backend_entertainment_frame(frame).await
             }
 
             BackendRequest::EntertainmentStop() => self.backend_entertainment_stop(wledws).await,
