@@ -123,11 +123,19 @@ impl WledBackend {
                 .zip(frame.info.leds.seglc.iter())
                 .enumerate()
             {
+                log::info!(
+                    "[{}] Adding light {}-{}: {} ({}, {})",
+                    self.name,
+                    frame.info.mac,
+                    index,
+                    frame.info.name,
+                    frame.info.arch,
+                    frame.info.core,
+                );
                 self.add_light(index as u8, seg, *lc, &frame.info).await?;
             }
             self.info = Some(frame.info);
         }
-        /* log::warn!("WLED: {frame:#?}"); */
         Ok(())
     }
 
