@@ -1,4 +1,5 @@
 mod backend_event;
+pub mod entertainment;
 pub mod error;
 pub mod websocket;
 pub mod wled_import;
