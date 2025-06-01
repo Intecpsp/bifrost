@@ -181,7 +181,7 @@ impl WledBackend {
                     let mut states: Vec<StateSegUpdate> = vec![];
 
                     for act in &scene.actions {
-                        let Some(index) = dbg!(self.rmap.get(&act.target)) else {
+                        let Some(index) = self.rmap.get(&act.target) else {
                             continue;
                         };
 
