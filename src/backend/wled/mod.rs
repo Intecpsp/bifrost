@@ -1,6 +1,7 @@
 mod backend_event;
 pub mod error;
 pub mod websocket;
+pub mod wled_import;
 
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -17,15 +18,12 @@ use tokio_tungstenite::{connect_async, tungstenite};
 use bifrost_api::backend::BackendRequest;
 use bifrost_api::config::WledServer;
 use hue::api::{
-    BridgeHome, ColorTemperature, DeviceArchetype, DeviceProductData, Dimming, GroupedLight, Light,
-    LightColor, LightEffects, LightEffectsV2, LightMetadata, MirekSchema, RType, Resource,
-    ResourceLink, Room, RoomArchetype, RoomMetadata, Stub,
+    BridgeHome, GroupedLight, RType, Resource, ResourceLink, Room, RoomArchetype, RoomMetadata,
 };
-use hue::xy::XY;
 use svc::error::SvcError;
 use svc::template::ServiceTemplate;
 use svc::traits::{BoxDynService, Service};
-use wled::{Color, SegCap, StateSeg, WledFrame, WledInfo};
+use wled::{WledFrame, WledInfo};
 
 use crate::backend::wled::websocket::WledWebSocket;
 use crate::error::{ApiError, ApiResult};
@@ -93,94 +91,6 @@ impl WledBackend {
 
     fn device_link(&self, index: u8) -> ResourceLink {
         RType::Device.deterministic((&self.name, u64::from(index)))
-    }
-
-    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-    pub async fn add_light(
-        &mut self,
-        index: u8,
-        state: &StateSeg,
-        features: SegCap,
-        info: &WledInfo,
-    ) -> ApiResult<()> {
-        let name = &info.name;
-
-        let link_device = self.device_link(index);
-        let link_light = RType::Light.deterministic(link_device);
-
-        let product_data = DeviceProductData {
-            model_id: self.server.url.to_string(),
-            manufacturer_name: info.brand.clone(),
-            product_name: info.product.clone(),
-            product_archetype: DeviceArchetype::HueLightstrip,
-            certified: false,
-            software_version: info.ver.clone(),
-            hardware_platform_type: None,
-        };
-        let metadata = LightMetadata::new(product_data.product_archetype.clone(), name);
-
-        let dev = hue::api::Device {
-            product_data,
-            metadata: metadata.clone().into(),
-            services: btreeset![link_light],
-            identify: Some(Stub),
-            usertest: None,
-        };
-
-        let mut light = Light::new(link_device, metadata);
-
-        light.dimming = Some(Dimming {
-            brightness: f64::from(state.bri) / 2.55,
-            min_dim_level: Some(1.0 / 255.0),
-        });
-        log::warn!("Detected dimming: {:?}", &light.dimming);
-
-        light.color_temperature = None;
-
-        if features.contains(SegCap::CCT) {
-            light.color_temperature = Some(ColorTemperature {
-                mirek: Some(((f64::from(state.cct) / 255.0).mul_add(424.0, 100.0)) as u16),
-                mirek_valid: false,
-                mirek_schema: MirekSchema {
-                    mirek_minimum: 100,
-                    mirek_maximum: 525,
-                },
-            });
-            log::warn!("Detected color temperature: {:?}", &light.color_temperature);
-        }
-
-        if features.contains(SegCap::RGB) {
-            let fc = state.col.primary;
-            match fc {
-                Color::Rgb([r, g, b]) | Color::Rgbw([r, g, b, _]) => {
-                    let xy = XY::from_rgb(r, g, b).0;
-                    light.color = Some(LightColor::new(xy));
-                    log::trace!("Detected color: {:?}", &light.color);
-                }
-                Color::None([]) => {}
-            }
-        }
-
-        light.effects = Some(LightEffects::all());
-        light.effects_v2 = Some(LightEffectsV2::all());
-
-        /* light.gradient = gradient.and_then(ExtractLightGradient::extract_from_expose); */
-        /* log::trace!("Detected gradient support: {:?}", &light.gradient); */
-
-        self.map.insert(index, link_light);
-        self.rmap.insert(link_device, index);
-        self.rmap.insert(link_light, index);
-
-        let mut res = self.state.lock().await;
-        /* res.aux_set(&link_light, AuxData::new().with_topic(name)); */
-        res.add(&link_device, Resource::Device(dev))?;
-        res.add(&link_light, Resource::Light(light))?;
-        /* res.add(&link_enttm, Resource::Entertainment(enttm))?; */
-        /* res.add(&link_taurus, Resource::Taurus(taurus))?; */
-        /* res.add(&link_zigcon, Resource::ZigbeeConnectivity(zigcon))?; */
-        drop(res);
-
-        Ok(())
     }
 
     #[allow(clippy::cast_possible_truncation)]
